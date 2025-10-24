@@ -1,11 +1,19 @@
-using MinimalApi;
+using MinimalApi; // garante que o namespace da API esteja acessível
 
-IHostBuilder CreateHostBuilder(string[] args){
-  return Host.CreateDefaultBuilder(args)
-    .ConfigureWebHostDefaults(webBuilder =>
-    {
-        webBuilder.UseStartup<Startup>();
-    });
-}
+var builder = WebApplication.CreateBuilder(args);
 
-CreateHostBuilder(args).Build().Run();
+// Cria uma instância da classe Startup (onde está toda a configuração da API)
+var startup = new Startup(builder.Configuration);
+
+// Adiciona os serviços configurados no Startup
+startup.ConfigureServices(builder.Services);
+
+// Constrói o app
+var app = builder.Build();
+
+// Configura o pipeline (rotas, autenticação, etc.)
+var env = app.Environment;
+startup.Configure(app, env);
+
+// Executa a aplicação
+app.Run();
